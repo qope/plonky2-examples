@@ -1,3 +1,4 @@
 fn main() {
-    println!("Please see example directories!");
+    println!("Please see the examples directory!");
+    println!("e.g. cargo run --example simple_quadratic_function");
 }
