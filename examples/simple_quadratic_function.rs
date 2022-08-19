@@ -9,6 +9,7 @@ type F = GoldilocksField;
 type C = PoseidonGoldilocksConfig;
 
 fn main() {
+    // Proof that "x = 1 satisfies x^2 - x = 0"
     let config = CircuitConfig::standard_recursion_config();
     let mut builder = CircuitBuilder::<F, 2>::new(config.clone());
     let x_t = builder.add_virtual_target();

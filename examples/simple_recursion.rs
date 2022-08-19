@@ -10,16 +10,16 @@ type C = PoseidonGoldilocksConfig;
 fn main() {
     let config = CircuitConfig::standard_recursion_config();
 
-    // First proof
+    // First proof "x = 1 satisfies x^2 - x = 0"
     let mut builder = CircuitBuilder::<F, 2>::new(config.clone());
     let x_t = builder.add_virtual_target();
     let x2_t = builder.exp_u64(x_t, 2);
-    let lhs_t = builder.sub(x2_t, x_t); // lhs = x^2 - x
+    let lhs_t = builder.sub(x2_t, x_t);
     let zero_t = builder.zero();
-    builder.connect(lhs_t, zero_t); // x^2 - x = 0
+    builder.connect(lhs_t, zero_t);
     let data = builder.build::<C>();
     let mut pw = PartialWitness::<F>::new();
-    pw.set_target(x_t, GoldilocksField(1)); // x = 1
+    pw.set_target(x_t, GoldilocksField(1));
     let proof = data.prove(pw).unwrap();
     match  data.verify(proof.clone()) {
         Ok(()) => println!("First proof: Ok!"),
