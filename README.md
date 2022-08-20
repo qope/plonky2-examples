@@ -3,7 +3,7 @@
 Some examples of plonky2 implementations. 
 
 ```
-cargo run --example {name}
+cargo run --release --example {name}
 ```
 
 - simple_quadratic_function.rs
