@@ -10,3 +10,9 @@ cargo run --release --example {name}
 - simple_hash_function
 - simple_recursive
 - simple_ecdsa_verification
+
+Rust nightly version is required.
+
+```
+rustup default nightly
+```
