@@ -4,7 +4,6 @@ use plonky2::plonk::circuit_data::CircuitConfig;
 use plonky2::plonk::circuit_builder::CircuitBuilder;
 use plonky2::plonk::config::PoseidonGoldilocksConfig;
 
-
 type F = GoldilocksField;
 type C = PoseidonGoldilocksConfig;
 
@@ -13,6 +12,7 @@ fn main() {
     let config = CircuitConfig::standard_recursion_config();
     let mut builder = CircuitBuilder::<F, 2>::new(config.clone());
     let x_t = builder.add_virtual_target();
+    builder.register_public_input(x_t);
     let x2_t = builder.exp_u64(x_t, 2);
     let lhs_t = builder.sub(x2_t, x_t); // lhs = x^2 - x
     let zero_t = builder.zero();
