@@ -13,6 +13,7 @@ fn main() {
     // First proof "x = 1 satisfies x^2 - x = 0"
     let mut builder = CircuitBuilder::<F, 2>::new(config.clone());
     let x_t = builder.add_virtual_target();
+    builder.register_public_input(x_t);
     let x2_t = builder.exp_u64(x_t, 2);
     let lhs_t = builder.sub(x2_t, x_t);
     let zero_t = builder.zero();
@@ -30,6 +31,7 @@ fn main() {
     let mut builder_recursive = CircuitBuilder::<F, 2>::new(config);
     let mut pw_recursive = PartialWitness::<F>::new();
     let proof_t = builder_recursive.add_virtual_proof_with_pis(&data.common);
+    builder_recursive.register_public_inputs(&proof_t.public_inputs);
     pw_recursive.set_proof_with_pis_target(&proof_t, &proof);
     let vd_target = VerifierCircuitTarget {
         constants_sigmas_cap: builder_recursive.add_virtual_cap(data.common.config.fri_config.cap_height),
@@ -38,8 +40,9 @@ fn main() {
     builder_recursive.verify_proof(proof_t, &vd_target, &data.common);
     let data_recursive = builder_recursive.build::<C>();
     let proof_recursive = data_recursive.prove(pw_recursive).unwrap();
-    match  data_recursive.verify(proof_recursive) {
+    match  data_recursive.verify(proof_recursive.clone()) {
         Ok(()) => println!("Recursive proof: Ok!"),
         Err(x) => println!("{}", x)
     }
+    println!("public inputs :{:?}", proof_recursive.public_inputs);
 }

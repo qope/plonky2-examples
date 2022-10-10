@@ -7,6 +7,7 @@ use plonky2::plonk::config::PoseidonGoldilocksConfig;
 type F = GoldilocksField;
 type C = PoseidonGoldilocksConfig;
 
+
 fn main() {
     // Proof that "x = 1 satisfies x^2 - x = 0"
     let config = CircuitConfig::standard_recursion_config();
@@ -21,8 +22,5 @@ fn main() {
     let mut pw = PartialWitness::<F>::new();
     pw.set_target(x_t, GoldilocksField(1)); // x = 1
     let proof = data.prove(pw).unwrap();
-    match  data.verify(proof) {
-        Ok(()) => println!("First proof: Ok!"),
-        Err(x) => println!("{}", x)
-    }
+    data.verify(proof).unwrap();
 }

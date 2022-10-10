@@ -28,8 +28,5 @@ fn main() {
     let data = builder.build::<C>();
     let pw = PartialWitness::<F>::new();
     let proof = data.prove(pw).unwrap();
-    match  data.verify(proof) {
-        Ok(()) => println!("Ok!"),
-        Err(x) => println!("{}", x)
-    }
+    data.verify(proof).unwrap();
 }
