@@ -10,7 +10,7 @@ use plonky2_ecdsa::curve::curve_types::{Curve, CurveScalar};
 use plonky2_ecdsa::curve::secp256k1::Secp256K1;
 use plonky2_ecdsa::curve::ecdsa::{sign_message, ECDSAPublicKey, ECDSASecretKey, ECDSASignature};
 use plonky2_ecdsa::gadgets::nonnative::CircuitBuilderNonNative;
-
+use plonky2::field::types::Sample;
 
 fn main(){
     const D: usize = 2;
