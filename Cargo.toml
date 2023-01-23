@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 plonky2 = { git = "https://github.com/mir-protocol/plonky2"}
 plonky2_ecdsa = { git = "https://github.com/mir-protocol/plonky2"}
+anyhow = "1"

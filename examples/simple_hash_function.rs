@@ -1,9 +1,9 @@
 use plonky2::field::goldilocks_field::GoldilocksField;
 use plonky2::hash::poseidon::PoseidonHash;
 use plonky2::iop::witness::PartialWitness;
-use plonky2::plonk::circuit_data::CircuitConfig;
 use plonky2::plonk::circuit_builder::CircuitBuilder;
-use plonky2::plonk::config::{PoseidonGoldilocksConfig, Hasher};
+use plonky2::plonk::circuit_data::CircuitConfig;
+use plonky2::plonk::config::{Hasher, PoseidonGoldilocksConfig};
 
 type F = GoldilocksField;
 type C = PoseidonGoldilocksConfig;
@@ -11,7 +11,7 @@ type C = PoseidonGoldilocksConfig;
 fn main() {
     let config = CircuitConfig::standard_recursion_config();
     let mut builder = CircuitBuilder::<F, 2>::new(config);
-    let x = GoldilocksField(1); // x = 1
+    let x = GoldilocksField(1);
     let x_t = builder.constant(x.clone());
     let hash_x = PoseidonHash::hash_no_pad(&[x.clone()]); // hash_x = hash(x)
     println!("x = {x}, hash(x) = {hash_x:?}");
