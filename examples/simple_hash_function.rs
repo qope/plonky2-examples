@@ -1,32 +1,44 @@
-use plonky2::field::goldilocks_field::GoldilocksField;
-use plonky2::hash::poseidon::PoseidonHash;
-use plonky2::iop::witness::PartialWitness;
-use plonky2::plonk::circuit_builder::CircuitBuilder;
-use plonky2::plonk::circuit_data::CircuitConfig;
-use plonky2::plonk::config::{Hasher, PoseidonGoldilocksConfig};
+use plonky2::{
+    field::{goldilocks_field::GoldilocksField, types::Field},
+    hash::poseidon::PoseidonHash,
+    iop::witness::{PartialWitness, WitnessWrite},
+    plonk::{
+        circuit_builder::CircuitBuilder,
+        circuit_data::CircuitConfig,
+        config::{Hasher, PoseidonGoldilocksConfig},
+    },
+};
 
-type F = GoldilocksField;
-type C = PoseidonGoldilocksConfig;
+use anyhow::Result;
 
-fn main() {
+fn main() -> Result<()> {
+    const D: usize = 2;
+    type F = GoldilocksField;
+    type C = PoseidonGoldilocksConfig;
+    type H = PoseidonHash;
+
+    let a = F::from_canonical_u64(42);
+    let hash_a = H::hash_no_pad(&[a.clone()]); // hash(a)
+
+    println!("a = {}, hash(a) = {:?}", a, hash_a);
+
+    // Proof that "I know x that hash(x) = hash_a"
     let config = CircuitConfig::standard_recursion_config();
-    let mut builder = CircuitBuilder::<F, 2>::new(config);
-    let x = GoldilocksField(1);
-    let x_t = builder.constant(x.clone());
-    let hash_x = PoseidonHash::hash_no_pad(&[x.clone()]); // hash_x = hash(x)
-    println!("x = {x}, hash(x) = {hash_x:?}");
+    let mut builder = CircuitBuilder::<F, D>::new(config);
 
-    let a_t = builder.add_virtual_target(); // add a variable
-    let hash_a_t = builder.add_virtual_hash(); // add a hash variable
+    let hash_a_t = builder.constant_hash(hash_a); // add constant hash target
+    let x_t = builder.add_virtual_target();
+    let hash_x_t = builder.hash_n_to_hash_no_pad::<H>(vec![x_t]);
 
-    builder.connect(x_t, a_t); // x = a
-    for i in 0..4 {
-        let i_th_hash_x_t = builder.constant(hash_x.elements[i]);
-        builder.connect(hash_a_t.elements[i], i_th_hash_x_t); // hash(a)[i] = hash(x)[i]
-    }
+    builder.connect_hashes(hash_x_t, hash_a_t); // hash(x) = hash_a
 
     let data = builder.build::<C>();
-    let pw = PartialWitness::<F>::new();
-    let proof = data.prove(pw).unwrap();
-    data.verify(proof).unwrap();
+
+    let mut pw = PartialWitness::<F>::new();
+    pw.set_target(x_t, F::from_canonical_u64(42)); // x = 42
+
+    let proof = data.prove(pw)?;
+    data.verify(proof)?;
+
+    Ok(())
 }
