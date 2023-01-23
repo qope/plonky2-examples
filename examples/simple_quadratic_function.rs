@@ -9,6 +9,7 @@ use plonky2::{
 
 use anyhow::Result;
 
+// If main function returns Err, Rust prints error code and a debug information.
 fn main() -> Result<()> {
     // Proof that "I know x that satisfies x^2 - 2x + 1 = 0"
 
