@@ -47,7 +47,7 @@ fn main() -> Result<()> {
     let config = CircuitConfig::standard_recursion_config();
     let mut builder = CircuitBuilder::<F, D>::new(config);
 
-    let proof_t = builder.add_virtual_proof_with_pis::<C>(&verifier_data.common);
+    let proof_t = builder.add_virtual_proof_with_pis(&verifier_data.common);
     builder.register_public_inputs(&proof_t.public_inputs); // register first proof's public input
 
     let constants_sigmas_cap_t =
