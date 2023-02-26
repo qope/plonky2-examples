@@ -1,18 +1,27 @@
-use plonky2::field::secp256k1_scalar::Secp256K1Scalar;
-use plonky2::field::types::Field;
-use plonky2::iop::witness::PartialWitness;
-use plonky2::plonk::circuit_data::CircuitConfig;
-use plonky2::plonk::circuit_builder::CircuitBuilder;
-use plonky2::plonk::config::{GenericConfig, PoseidonGoldilocksConfig};
-use plonky2_ecdsa::gadgets::ecdsa::{ECDSASignatureTarget, ECDSAPublicKeyTarget, verify_message_circuit};
-use plonky2_ecdsa::gadgets::curve::CircuitBuilderCurve;
-use plonky2_ecdsa::curve::curve_types::{Curve, CurveScalar};
-use plonky2_ecdsa::curve::secp256k1::Secp256K1;
-use plonky2_ecdsa::curve::ecdsa::{sign_message, ECDSAPublicKey, ECDSASecretKey, ECDSASignature};
-use plonky2_ecdsa::gadgets::nonnative::CircuitBuilderNonNative;
-use plonky2::field::types::Sample;
+use anyhow::Result;
+use plonky2::{
+    field::{secp256k1_scalar::Secp256K1Scalar, types::Sample},
+    iop::witness::PartialWitness,
+    plonk::{
+        circuit_builder::CircuitBuilder,
+        circuit_data::CircuitConfig,
+        config::{GenericConfig, PoseidonGoldilocksConfig},
+    },
+};
+use plonky2_ecdsa::{
+    curve::{
+        curve_types::{Curve, CurveScalar},
+        ecdsa::{sign_message, ECDSAPublicKey, ECDSASecretKey, ECDSASignature},
+        secp256k1::Secp256K1,
+    },
+    gadgets::{
+        curve::CircuitBuilderCurve,
+        ecdsa::{verify_message_circuit, ECDSAPublicKeyTarget, ECDSASignatureTarget},
+        nonnative::CircuitBuilderNonNative,
+    },
+};
 
-fn main(){
+fn main() -> Result<()> {
     const D: usize = 2;
     type C = PoseidonGoldilocksConfig;
     type F = <C as GenericConfig<D>>::F;
@@ -42,9 +51,7 @@ fn main(){
     verify_message_circuit(&mut builder, msg_target, sig_target, pk_target);
     println!("{sig:?}");
     let data = builder.build::<C>();
-    let proof = data.prove(pw).unwrap();
-    match  data.verify(proof) {
-        Ok(()) => println!("Ok!"),
-        Err(x) => println!("{}", x)
-    }
+    let proof = data.prove(pw)?;
+    data.verify(proof)?;
+    Ok(())
 }
